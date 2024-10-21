@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .forms import UserRegister
+from .models import *
 
 # Create your views here.
 def platform(request):
@@ -7,8 +8,11 @@ def platform(request):
 
 
 def games_view(request):
-    games = ['The Witcher 3: Wild Hunt', 'Cyberpunk 2077', 'Doom Eternal']
-    return render(request, 'games.html', {'games': games})
+    Games = Game.objects.all()
+    context = {
+        "Games": Games
+    }
+    return render(request, 'games.html', context)
 
 def cart_view(request):
     return render(request, 'cart.html')
@@ -29,9 +33,10 @@ def sign_up(request):
                 info['error'] = 'Пароли не совпадают'
             elif age < 18:
                 info['error'] = 'Вы должны быть старше 18'
-            elif username in users:
+            elif Buyer.objects.filter(name=username).exists():
                 info['error'] = 'Пользователь уже существует'
             else:
+                Buyer.objects.create(name=username, password=password, age=age)
                 info['success'] = f'Приветствуем, {username}!'
 
     info['form'] = form
